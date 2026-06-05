@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나를 만나는 시간</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f3ef; --surface:#fff; --border:#ddd;
+  --text:#111; --text-mid:#444; --text-soft:#777; --text-faint:#aaa;
+  --dark:#1a1a1a;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:var(--dark);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.nav-brand{font-family:'Noto Serif KR',serif;color:#fff;font-size:14px;letter-spacing:4px;font-weight:300}
+.nav-tabs{display:flex}
+.nav-tab{font-size:11px;letter-spacing:1.5px;color:#666;padding:0 18px;height:56px;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'Noto Sans KR',sans-serif}
+.nav-tab.active{color:#fff;border-bottom-color:#888}
+.nav-tab:hover:not(.active){color:#bbb}
+
+/* TOOLBAR */
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:8px 28px;gap:8px}
+.save-note{font-size:11px;color:var(--text-soft);margin-right:auto}
+.tbtn{display:flex;align-items:center;gap:5px;font-family:'Noto Sans KR',sans-serif;font-size:11px;letter-spacing:1px;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tbtn-dark{background:var(--dark);color:#fff;border:none}.tbtn-dark:hover{background:#333}
+.tbtn-light{background:var(--surface);color:var(--text-mid);border:1px solid var(--border)}.tbtn-light:hover{background:var(--bg)}
+
+/* PAGES */
+.page{display:none}.page.active{display:block}
+
+/* SECTION HEADER */
+.sec-hdr{text-align:center;padding:48px 32px 28px;border-bottom:1px solid var(--border);margin-bottom:36px}
+.sec-hdr h1{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:300;letter-spacing:5px}
+.sec-hdr p{margin-top:10px;font-size:13px;color:var(--text-soft);line-height:2}
+
+/* QAIRE */
+.qaire-wrap{max-width:820px;margin:0 auto;padding:0 28px 80px}
+.qaire-intro{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:32px;font-size:14px;color:var(--text-mid);line-height:1.9}
+.qaire-intro strong{color:var(--text);font-weight:500}
+.qaire-section{margin-bottom:40px}
+.qaire-section-title{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:400;letter-spacing:2px;color:var(--text);margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--dark);display:flex;align-items:center;gap:10px}
+.qaire-section-num{width:26px;height:26px;background:var(--dark);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.q-item{margin-bottom:20px}
+.q-item-label{font-size:14px;color:var(--text);font-weight:500;margin-bottom:7px;display:flex;align-items:flex-start;gap:8px;line-height:1.6}
+.q-item-label .num{color:var(--text-soft);font-size:12px;min-width:24px;margin-top:2px;flex-shrink:0}
+.q-item-hint{font-size:12px;color:var(--text-soft);margin-top:5px;padding-left:32px;line-height:1.7}
+textarea,input[type=text]{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);resize:vertical;outline:none;transition:border .2s}
+textarea:focus,input[type=text]:focus{border-color:#888}
+textarea::placeholder,input::placeholder{color:var(--text-faint)}
+.rating-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.rating-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-mid);transition:all .15s}
+.rating-btn.sel{background:var(--dark);color:#fff;border-color:var(--dark)}
+.rating-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--text-soft);margin-top:4px}
+
+/* TIMETABLE PAGE */
+.clock-page{max-width:1100px;margin:0 auto;padding:0 28px 80px}
+.day-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.day-pill{font-size:12px;letter-spacing:1px;padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-mid);cursor:pointer;transition:all .15s;font-family:'Noto Sans KR',sans-serif}
+.day-pill.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.day-pill:hover:not(.active){background:var(--bg)}
+.view-toggle{display:flex;gap:6px;margin-bottom:24px;align-items:center}
+.view-toggle span{font-size:12px;color:var(--text-soft);margin-right:4px}
+
+/* CLOCK LAYOUT */
+.clock-layout{display:grid;grid-template-columns:1fr 380px;gap:36px;align-items:start}
+@media(max-width:860px){.clock-layout{grid-template-columns:1fr}}
+#clockCanvas{width:100%;max-width:580px;display:block;margin:0 auto;cursor:pointer}
+
+/* LEGEND PANEL */
+.legend-panel{background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:20px}
+.panel-title{font-family:'Noto Serif KR',serif;font-size:14px;letter-spacing:2px;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.leg-row{display:grid;grid-template-columns:10px 48px 1fr 24px;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+.leg-time{font-size:11px;color:var(--text-soft)}
+.leg-text{color:var(--text)}
+.leg-color-btn{width:20px;height:20px;border-radius:3px;border:1px solid #ccc;cursor:pointer;padding:0;background:transparent;font-size:10px;display:flex;align-items:center;justify-content:center;color:#999}
+.leg-color-btn:hover{border-color:#666;color:#333}
+.type-key{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.type-k{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-soft)}
+.type-k-dot{width:9px;height:9px;border-radius:2px}
+.empty-note{font-size:13px;color:var(--text-faint);padding:10px 0;line-height:1.8}
+
+/* WEEKLY TABLE */
+.weekly-wrap{overflow-x:auto}
+.weekly-table{width:100%;min-width:700px;border-collapse:collapse}
+.weekly-table th{background:var(--dark);color:#fff;font-size:12px;letter-spacing:1px;font-weight:400;padding:11px 8px;text-align:center;border-right:1px solid #333}
+.weekly-table th:last-child{border-right:none}
+.time-col-td{font-size:11px;color:var(--text-soft);text-align:right;padding:4px 8px 4px 4px;border-right:1px solid var(--border);background:var(--bg);white-space:nowrap}
+.weekly-table td{border:1px solid var(--border);padding:3px;vertical-align:top;position:relative}
+.wk-cell-wrap{display:flex;align-items:stretch;min-height:30px}
+.wk-color-bar{width:4px;border-radius:2px;flex-shrink:0;margin-right:3px}
+.wk-inp{width:100%;font-size:12px;border:none;background:transparent;outline:none;resize:none;color:var(--text);line-height:1.5;min-height:28px;font-family:'Noto Sans KR',sans-serif;padding:2px 3px}
+
+/* COLOR PICKER POPUP */
+.color-popup{position:absolute;z-index:100;background:#fff;border:1px solid #ccc;border-radius:8px;padding:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);display:none;flex-wrap:wrap;gap:6px;width:180px}
+.color-popup.open{display:flex}
+.cp-swatch{width:24px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.cp-swatch:hover{transform:scale(1.15);border-color:#333}
+.cp-swatch.selected{border-color:#000}
+.cp-clear{font-size:11px;width:100%;text-align:center;padding:4px;border:none;background:#f5f5f5;border-radius:4px;cursor:pointer;color:#666}
+
+/* MONTHLY */
+.monthly-wrap{max-width:980px;margin:0 auto;padding:0 28px 80px}
+.month-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.month-title{font-family:'Noto Serif KR',serif;font-size:20px;letter-spacing:3px}
+.month-nav-btns{display:flex;gap:8px}
+.month-nav-btns button{background:none;border:1px solid var(--border);width:32px;height:32px;cursor:pointer;border-radius:6px;font-size:16px;color:var(--text-mid)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.cal-dow{background:var(--dark);color:#fff;text-align:center;font-size:11px;letter-spacing:1.5px;padding:10px 0}
+.cal-cell{min-height:88px;padding:5px;border-right:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8;background:var(--surface);cursor:pointer;transition:background .12s}
+.cal-cell:hover{background:#f5f4f0}
+.cal-cell.empty{background:var(--bg);cursor:default}
+.cal-date{font-size:12px;color:var(--text-mid);font-weight:500;margin-bottom:3px}
+.cal-cell.today .cal-date{background:var(--dark);color:#fff;width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+.ev{font-size:11px;padding:2px 5px;border-radius:3px;margin-bottom:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+.ev.t-cur{background:#e8e8e8;color:#222}
+.ev.t-want{background:#555;color:#fff}
+.ev.t-must{background:#aaa;color:#111}
+
+/* GOALS */
+.goals-sec{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px 26px;margin-top:26px}
+.goals-sec-title{font-family:'Noto Serif KR',serif;font-size:15px;letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.goal-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.goal-item:last-child{border-bottom:none}
+.goal-chk{width:16px;height:16px;border:1.5px solid var(--border);border-radius:3px;cursor:pointer;flex-shrink:0;appearance:none;background:var(--surface);display:grid;place-items:center}
+.goal-chk:checked{background:var(--dark);border-color:var(--dark)}
+.goal-chk:checked::after{content:'✓';color:#fff;font-size:10px}
+.goal-txt{font-size:14px;color:var(--text);flex:1}
+.goal-del{background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:17px;padding:0 4px}
+.goal-add{display:flex;gap:8px;margin-top:12px}
+.goal-add input{flex:1}
+.goal-add-btn{background:var(--dark);color:#fff;border:none;border-radius:6px;padding:0 16px;cursor:pointer;font-size:20px}
+
+/* BTN */
+.btn-row{display:flex;gap:12px;justify-content:center;margin-top:40px}
+.btn{font-family:'Noto Sans KR',sans-serif;font-size:12px;letter-spacing:2px;padding:12px 32px;border-radius:6px;cursor:pointer;transition:all .2s}
+.btn-p{background:var(--dark);color:#fff;border:none}.btn-p:hover{background:#333}
+.btn-s{background:transparent;color:var(--text);border:1px solid var(--border)}.btn-s:hover{border-color:var(--text)}
+
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:#fff;border-radius:10px;padding:26px;width:380px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:mIn .18s ease}
+@keyframes mIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal h3{font-family:'Noto Serif KR',serif;font-size:16px;margin-bottom:16px;letter-spacing:1px}
+.modal label{font-size:12px;color:var(--text-soft);display:block;margin-bottom:4px}
+.modal input,.modal select,.modal textarea{margin-bottom:12px;font-size:14px}
+.modal select{width:100%;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--text);outline:none}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.mbtn{font-size:12px;letter-spacing:1.5px;padding:9px 18px;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.mbtn-ok{background:var(--dark);color:#fff;border:none}.mbtn-ok:hover{background:#333}
+.mbtn-cancel{background:transparent;border:1px solid var(--border);color:var(--text-mid)}
+.mbtn-del{background:transparent;border:1px solid #ccc;color:#999;margin-right:auto}
+
+/* PROGRESS RING */
+.p-ring{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ring-svg{width:42px;height:42px}
+.ring-info{font-size:12px;color:var(--text-soft)}
+.ring-num{font-size:20px;font-weight:500;color:var(--text);line-height:1}
+
+/* day answer panel in timetable */
+.day-answers{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:24px}
+.day-answers-title{font-family:'Noto Serif KR',serif;font-size:14px;letter-spacing:2px;margin-bottom:14px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
+.day-ans-item{margin-bottom:12px}
+.day-ans-q{font-size:12px;color:var(--text-soft);margin-bottom:3px}
+.day-ans-a{font-size:13px;color:var(--text);line-height:1.7;background:var(--bg);padding:8px 12px;border-radius:6px;min-height:36px}
+
+@media print{
+  .nav,.toolbar,.btn-row,.day-bar,.view-toggle{display:none!important}
+  .page{display:block!important;page-break-after:always}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">나를 만나는 시간</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('qaire')">나의 하루 탐색</button>
+    <button class="nav-tab" onclick="showPage('clock')">타임테이블</button>
+  </div>
+</nav>
+
+<div class="toolbar">
+  <span class="save-note" id="saveNote">● 저장하지 않은 변경사항</span>
+  <button class="tbtn tbtn-light" onclick="loadData()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>불러오기
+  </button>
+  <button class="tbtn tbtn-dark" onclick="saveData()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>저장하기
+  </button>
+  <button class="tbtn tbtn-light" onclick="doPrint()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>인쇄/PDF
+  </button>
+</div>
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleLoad(event)">
+
+<!-- ════ PAGE 1: 성찰 질문지 ════ -->
+<div id="page-qaire" class="page active">
+  <div class="sec-hdr">
+    <h1>나의 하루 탐색</h1>
+    <p>지금 내가 살아가는 시간을 들여다봅니다.<br>떠오르는 대로, 솔직하게 적어보세요.</p>
+  </div>
+  <div class="qaire-wrap">
+    <div class="qaire-intro">
+      이 질문지는 <strong>집단상담 자기이해 프로그램</strong>의 일환입니다.<br>
+      나의 시간 사용 방식을 통해 <strong>내가 진짜 원하는 삶</strong>이 무엇인지 탐색합니다.<br>
+      정답은 없습니다. 지금 떠오르는 것을 그대로 적어주세요.
+    </div>
+
+    <!-- SECTION 1: 하루 들여다보기 -->
+    <div class="qaire-section">
+      <div class="qaire-section-title"><div class="qaire-section-num">②</div>지금 나의 하루 들여다보기</div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q1</span>오늘 하루를 시간순으로 떠올려보세요. 어떻게 시작해서 어떻게 끝났나요?</div>
+        <textarea class="qaire-ans" data-key="q1" data-day-key="true" rows="3" placeholder="아침에 일어나서 ... 잠들기 전까지 ..."></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q2</span>하고 싶은데 아직 못 하고 있는 것은? (취미, 운동, 배움 등)</div>
+        <textarea class="qaire-ans" data-key="q2" data-day-key="true" rows="3" placeholder="예) 수영 배우기, 독서 모임, 혼자 여행 ..."></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q3</span>하기 싫지만 해야 할 것 같은 일은?</div>
+        <textarea class="qaire-ans" data-key="q3" data-day-key="true" rows="3" placeholder="예) 야근, 가족 모임, 건강검진 ..."></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q4</span>하루 중 가장 많은 시간을 쓴 활동은? 그 이유는?</div>
+        <textarea class="qaire-ans" data-key="q4" data-day-key="true" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q5</span>하루가 끝날 때 주로 어떤 감정을 느끼나요?</div>
+        <textarea class="qaire-ans" data-key="q5" data-day-key="true" rows="2" placeholder="예) 뿌듯함, 허무함, 피로감, 불안함 ..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 2: 에너지 흐름 -->
+    <div class="qaire-section">
+      <div class="qaire-section-title"><div class="qaire-section-num">③</div>시간과 에너지의 흐름</div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q6</span>하루 중 가장 에너지가 넘치는 시간대와 그 때 하는 활동은?</div>
+        <textarea class="qaire-ans" data-key="q6" data-day-key="true" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q7</span>에너지가 빠져나가는 활동이나 상황은?</div>
+        <textarea class="qaire-ans" data-key="q7" data-day-key="true" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q8</span>하고 나면 오히려 에너지가 채워지는 활동이 있나요?</div>
+        <textarea class="qaire-ans" data-key="q8" data-day-key="true" rows="2" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q9</span>나의 하루 중 '의무'와 '선택'의 비율은?</div>
+        <div class="rating-row" id="ratingQ9"></div>
+        <div class="rating-ends"><span>의무 100%</span><span>선택 100%</span></div>
+        <div class="q-item-hint">그 비율에 대해 어떤 느낌이 드나요?</div>
+        <textarea class="qaire-ans" data-key="q9b" data-day-key="true" rows="2" placeholder="" style="margin-top:8px"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 3: 원하는 삶 -->
+    <div class="qaire-section">
+      <div class="qaire-section-title"><div class="qaire-section-num">④</div>원하는 삶과 현재 삶의 거리</div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q10</span>진심으로 하고 싶지만 못 하고 있는 것은?</div>
+        <textarea class="qaire-ans" data-key="q10" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q11</span>그것을 하지 못하게 하는 가장 큰 이유는?</div>
+        <textarea class="qaire-ans" data-key="q11" rows="3" placeholder="예) 시간 없음, 자신 없음, 눈치 ..."></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q12</span>하루에 2시간이 더 생긴다면 어떻게 쓰고 싶나요?</div>
+        <textarea class="qaire-ans" data-key="q12" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q13</span>현재 삶과 원하는 삶이 얼마나 다른가요?</div>
+        <div class="rating-row" id="ratingQ13"></div>
+        <div class="rating-ends"><span>매우 비슷함</span><span>매우 다름</span></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: 한 해 -->
+    <div class="qaire-section">
+      <div class="qaire-section-title"><div class="qaire-section-num">⑤</div>한 해를 돌아보며</div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q14</span>올해 가장 잘했다고 생각하는 것은?</div>
+        <textarea class="qaire-ans" data-key="q14" rows="3" placeholder="작은 것도 괜찮아요"></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q15</span>올해 아쉬웠거나 후회되는 것이 있나요?</div>
+        <textarea class="qaire-ans" data-key="q15" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q16</span>올해가 끝나기 전 꼭 해보고 싶은 것은?</div>
+        <textarea class="qaire-ans" data-key="q16" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q17</span>올해 꼭 이루고 싶은 목표 (한 줄에 하나씩)</div>
+        <textarea class="qaire-ans" data-key="q17goals" rows="4" placeholder="예) 5kg 감량&#10;부모님과 여행&#10;책 10권 읽기"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 5: 나에게 -->
+    <div class="qaire-section">
+      <div class="qaire-section-title"><div class="qaire-section-num">⑥</div>나에게 보내는 메시지</div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q18</span>지금 나 자신에게 해주고 싶은 말은?</div>
+        <textarea class="qaire-ans" data-key="q18" rows="4" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q19</span>이 질문지를 작성하면서 새롭게 알게 된 것이 있나요?</div>
+        <textarea class="qaire-ans" data-key="q19" rows="4" placeholder=""></textarea>
+      </div>
+      <div class="q-item">
+        <div class="q-item-label"><span class="num">Q20</span>나의 시간을 위해 한 가지 변화를 만든다면?</div>
+        <textarea class="qaire-ans" data-key="q20" rows="3" placeholder="작고 구체적일수록 좋아요"></textarea>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-s" onclick="resetQaire()">초기화</button>
+      <button class="btn btn-p" onclick="applyQaireGoals();showPage('clock')">타임테이블 보기 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE 2: 타임테이블 ════ -->
+<div id="page-clock" class="page">
+  <div class="sec-hdr">
+    <h1>나의 타임테이블</h1>
+    <p>하루와 한 주를 시각적으로 살펴보세요</p>
+  </div>
+  <div class="clock-page">
+    <div class="view-toggle">
+      <span>보기 방식</span>
+      <button class="day-pill active" id="viewRadial" onclick="setView('radial')">원형 시계</button>
+      <button class="day-pill" id="viewWeekly" onclick="setView('weekly')">요일별 표</button>
+    </div>
+
+    <!-- RADIAL -->
+    <div id="radialView">
+      <div class="day-bar" id="clockDayBar"></div>
+      <div class="clock-layout">
+        <div><canvas id="clockCanvas" width="580" height="580"></canvas></div>
+        <div class="legend-panel">
+          <div class="panel-title" id="legendDayTitle">하루 일과</div>
+          <div id="legendList"></div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WEEKLY -->
+    <div id="weeklyView" style="display:none">
+      <div class="weekly-wrap">
+        <table class="weekly-table" id="weeklyTable"></table>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-s" onclick="showPage('qaire')">← 탐색지</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modalOv">
+  <div class="modal">
+    <h3 id="modalTitle">일정 추가</h3>
+    <label>활동 내용</label>
+    <input type="text" id="modalText" placeholder="활동 내용">
+    <label>유형</label>
+    <select id="modalType">
+      <option value="cur">현재 일과</option>
+      <option value="want">하고 싶은 것</option>
+      <option value="must">해야 하는 것</option>
+    </select>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-del" id="modalDel" onclick="deleteEvent()" style="display:none">삭제</button>
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">취소</button>
+      <button class="mbtn mbtn-ok" onclick="saveEvent()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- COLOR POPUP -->
+<div class="color-popup" id="colorPopup">
+  <button class="cp-clear" onclick="clearSegColor()">색상 제거</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// DEBOUNCE
+// ══════════════════════════════════════════════
+let _clockTimer=null;
+function drawClockDebounced(){
+  // 입력 중엔 캔버스만 다시 그림 (DOM 재생성 없음 → 포커스 유지)
+  clearTimeout(_clockTimer);
+  _clockTimer=setTimeout(()=>drawClock(),350);
+}
+
+// ══════════════════════════════════════════════
+// CONSTANTS & DATA
+// ══════════════════════════════════════════════
+const DAYS=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+const HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+':00');
+const HOUR_KO=['자정','새벽1시','새벽2시','새벽3시','새벽4시','새벽5시','오전6시','오전7시','오전8시','오전9시','오전10시','오전11시','정오','오후1시','오후2시','오후3시','오후4시','오후5시','오후6시','오후7시','오후8시','오후9시','오후10시','오후11시'];
+const TYPE_COL={cur:'#2d2d2d',want:'#5a5a5a',must:'#a0a0a0',empty:'#e8e6e0'};
+const TYPE_TEXT={cur:'#fff',want:'#fff',must:'#222',empty:'#bbb'};
+
+// 색상 팔레트 (무채색 + 채색)
+const PALETTE=[
+  // 무채색
+  '#111111','#444444','#777777','#aaaaaa','#cccccc','#e8e8e8',
+  // 따뜻한 계열
+  '#c0392b','#e74c3c','#e67e22','#f39c12','#f1c40f','#d4ac0d',
+  // 초록/청록
+  '#27ae60','#2ecc71','#1abc9c','#16a085',
+  // 파랑/보라
+  '#2980b9','#3498db','#8e44ad','#9b59b6',
+  // 파스텔
+  '#fadbd8','#fdebd0','#fef9e7','#eafaf1','#d6eaf8','#e8daef',
+  // 어두운 채색
+  '#922b21','#784212','#145a32','#154360','#4a235a',
+];
+
+// schedule[day][hour] = {text, type, color?}
+let schedule={};
+DAYS.forEach(d=>{schedule[d]={};});
+let calEvents={};
+let goals=[];
+let qaireAnswers={};   // key -> text (global)
+let dayAnswers={};     // day -> {q1..q9b} (per-day answers)
+DAYS.forEach(d=>{dayAnswers[d]={};});
+let ratingAnswers={};
+
+let curDay=DAYS[new Date().getDay()];
+let currentView='radial';
+let currentYear=new Date().getFullYear();
+let currentMonth=new Date().getMonth();
+let modalDate=null, modalEvIdx=null;
+let colorTargetDay=null, colorTargetHour=null;
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function init(){
+  buildPalette();
+  buildClockDayBar();
+  buildWeeklyTable();
+  buildRatings();
+  renderGoals();
+  bindQaireTextareas();
+  updateSaveNote(true);
+}
+
+// ══════════════════════════════════════════════
+// PAGE NAV
+// ══════════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const idx={qaire:0,clock:1};
+  document.querySelectorAll('.nav-tab')[idx[name]].classList.add('active');
+  if(name==='clock'){buildClockDayBar();buildLegend();if(currentView==='radial')drawClock();else buildWeeklyTable();}
+  if(name==='monthly')renderCalendar();
+}
+
+// ══════════════════════════════════════════════
+// QAIRE DAY BAR & TIME GRID (성찰 질문지 내 기록)
+// ══════════════════════════════════════════════
+function buildQaireDayBar(){
+  const bar=document.getElementById('qaireDayBar'); bar.innerHTML='';
+  DAYS.forEach(d=>{
+    const btn=document.createElement('button'); btn.className='day-pill'+(d===curDay?' active':'');
+    btn.textContent=d.replace('요일','');
+    btn.onclick=()=>{curDay=d;buildQaireDayBar();buildQaireTimeGrid();bindDayTextareas();buildClockDayBar();markUnsaved();};
+    bar.appendChild(btn);
+  });
+}
+
+function buildQaireTimeGrid(){
+  const grid=document.getElementById('qaireTimeGrid'); grid.innerHTML='';
+  HOURS.forEach((h,i)=>{
+    const wrap=document.createElement('div'); wrap.style.cssText='display:flex;flex-direction:column;gap:4px;';
+    // color swatch + input row
+    const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:6px 10px;';
+
+    // color swatch
+    const swatch=document.createElement('div'); swatch.dataset.hour=h;
+    const entry=schedule[curDay][h];
+    const swatchColor=entry&&entry.color?entry.color:(entry&&entry.text?TYPE_COL[entry.type]:'#e8e6e0');
+    swatch.style.cssText=`width:12px;height:12px;border-radius:3px;background:${swatchColor};cursor:pointer;flex-shrink:0;border:1px solid #bbb`;
+    swatch.onclick=(e)=>{e.stopPropagation();openColorPopup(curDay,h,e.currentTarget);};
+
+    const lbl=document.createElement('span'); lbl.style.cssText='font-size:11px;color:#777;min-width:40px;'; lbl.textContent=h;
+    const inp=document.createElement('input'); inp.type='text'; inp.dataset.hour=h;
+    inp.style.cssText='border:none;background:transparent;font-size:13px;color:#111;flex:1;outline:none;';
+    inp.placeholder=HOUR_KO[i];
+    inp.value=entry?entry.text:'';
+    inp.oninput=function(){ensureEntry(curDay,h);schedule[curDay][h].text=this.value;markUnsaved();if(currentView==='radial')drawClockDebounced();};
+    row.append(swatch,lbl,inp);
+
+    // type tags
+    const tsel=document.createElement('div'); tsel.style.cssText='display:flex;gap:4px;padding-left:2px;';
+    [{k:'cur',l:'현재'},{k:'want',l:'원함'},{k:'must',l:'해야함'}].forEach(({k,l})=>{
+      const btn=document.createElement('button');
+      const isSel=entry&&entry.type===k;
+      btn.style.cssText=`font-size:10px;padding:2px 8px;border-radius:10px;cursor:pointer;white-space:nowrap;border:1px solid #ccc;transition:all .12s;background:${isSel?(k==='cur'?'#222':k==='want'?'#555':'#999'):'transparent'};color:${isSel?'#fff':'#777'}`;
+      btn.textContent=l; btn.dataset.hour=h; btn.dataset.type=k;
+      btn.onclick=()=>{ensureEntry(curDay,h);schedule[curDay][h].type=k;buildQaireTimeGrid();markUnsaved();if(currentView==='radial')drawClock();};
+      tsel.appendChild(btn);
+    });
+    wrap.append(row,tsel); grid.appendChild(wrap);
+  });
+}
+
+function ensureEntry(day,h){if(!schedule[day][h])schedule[day][h]={text:'',type:'cur'};}
+
+// ══════════════════════════════════════════════
+// QAIRE TEXTAREAS — day-key questions per curDay
+// ══════════════════════════════════════════════
+function bindQaireTextareas(){
+  document.querySelectorAll('.qaire-ans').forEach(ta=>{
+    const key=ta.dataset.key;
+    if(ta.dataset.dayKey){
+      ta.value=dayAnswers[curDay][key]||'';
+      ta.oninput=()=>{dayAnswers[curDay][key]=ta.value;markUnsaved();};
+    } else {
+      ta.value=qaireAnswers[key]||'';
+      ta.oninput=()=>{qaireAnswers[key]=ta.value;markUnsaved();};
+    }
+  });
+}
+
+function bindDayTextareas(){
+  document.querySelectorAll('.qaire-ans[data-day-key]').forEach(ta=>{
+    const key=ta.dataset.key;
+    ta.value=dayAnswers[curDay][key]||'';
+    ta.oninput=()=>{dayAnswers[curDay][key]=ta.value;markUnsaved();};
+  });
+}
+
+function applyQaireGoals(){
+  const raw=document.getElementById('qaireTimeGrid') ? (qaireAnswers['q17goals']||'') : '';
+  const txt=document.querySelector('.qaire-ans[data-key="q17goals"]')?.value||'';
+  if(txt.trim()){txt.trim().split('\n').filter(x=>x.trim()).forEach(g=>{if(!goals.find(x=>x.text===g.trim()))goals.push({text:g.trim(),done:false});});}
+  renderGoals();markUnsaved();
+}
+
+function resetQaire(){
+  if(!confirm('모든 답변을 초기화할까요?'))return;
+  qaireAnswers={};DAYS.forEach(d=>{dayAnswers[d]={};});ratingAnswers={};
+  document.querySelectorAll('.qaire-ans').forEach(ta=>ta.value='');
+  document.querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('sel'));
+  DAYS.forEach(d=>{schedule[d]={};});
+  buildQaireTimeGrid();markUnsaved();
+}
+
+// ══════════════════════════════════════════════
+// CLOCK DAY BAR
+// ══════════════════════════════════════════════
+function buildClockDayBar(){
+  const bar=document.getElementById('clockDayBar'); bar.innerHTML='';
+  DAYS.forEach(d=>{
+    const btn=document.createElement('button'); btn.className='day-pill'+(d===curDay?' active':'');
+    btn.textContent=d.replace('요일','');
+    btn.onclick=()=>{curDay=d;buildClockDayBar();bindDayTextareas();buildLegend();drawClock();};
+    bar.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════════════
+// DAY ANSWERS PANEL
+// ══════════════════════════════════════════════
+const DAY_Q_LABELS={
+  q1:'하루 흐름',q2:'하고 싶은 것',q3:'해야 하는 것',
+  q4:'많은 시간을 쓴 활동',q5:'하루 끝 감정',
+  q6:'에너지 넘치는 시간대',q7:'에너지 소모 활동',q8:'에너지 충전 활동',
+  q9b:'의무/선택 비율 소감'
+};
+
+function buildDayAnswers(){
+  const wrap=document.getElementById('dayAnswers'); if(!wrap)return;
+  const ans=dayAnswers[curDay]||{};
+  const hasAny=Object.values(ans).some(v=>v&&v.trim());
+  if(!hasAny){wrap.innerHTML='';return;}
+  let html=`<div class="day-answers-title">${curDay} — 성찰 질문 답변</div>`;
+  Object.entries(DAY_Q_LABELS).forEach(([k,lbl])=>{
+    if(ans[k]&&ans[k].trim()) html+=`<div class="day-ans-item"><div class="day-ans-q">${lbl}</div><div class="day-ans-a">${ans[k].replace(/\n/g,'<br>')}</div></div>`;
+  });
+  wrap.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════
+// COLOR POPUP
+// ══════════════════════════════════════════════
+function buildPalette(){
+  const popup=document.getElementById('colorPopup');
+  PALETTE.forEach(col=>{
+    const sw=document.createElement('div'); sw.className='cp-swatch'; sw.style.background=col;
+    sw.onclick=()=>applySegColor(col); popup.appendChild(sw);
+  });
+  document.addEventListener('click',e=>{if(!e.target.closest('#colorPopup')&&!e.target.dataset.hour)closeColorPopup();});
+}
+
+function openColorPopup(day,h,anchor){
+  colorTargetDay=day; colorTargetHour=h;
+  const popup=document.getElementById('colorPopup');
+  const rect=anchor.getBoundingClientRect();
+  popup.style.top=(rect.bottom+window.scrollY+4)+'px';
+  popup.style.left=(rect.left+window.scrollX)+'px';
+  popup.style.position='absolute';
+  // mark selected
+  popup.querySelectorAll('.cp-swatch').forEach(sw=>{sw.classList.toggle('selected',sw.style.background===hexToRgb(schedule[day][h]?.color||''));});
+  popup.classList.add('open');
+}
+
+function closeColorPopup(){document.getElementById('colorPopup').classList.remove('open');}
+
+function applySegColor(col){
+  if(!colorTargetDay||!colorTargetHour)return;
+  ensureEntry(colorTargetDay,colorTargetHour);
+  schedule[colorTargetDay][colorTargetHour].color=col;
+  closeColorPopup();
+  markUnsaved();
+  // DOM 재생성 없이 dot 색상만 즉시 업데이트
+  document.querySelectorAll('#legendList [data-hour="'+colorTargetHour+'"]').forEach(el=>el.style.background=col);
+  if(currentView==='radial') drawClock();
+  else buildWeeklyTable();
+}
+
+function clearSegColor(){
+  if(!colorTargetDay||!colorTargetHour)return;
+  if(schedule[colorTargetDay]?.[colorTargetHour]) delete schedule[colorTargetDay][colorTargetHour].color;
+  closeColorPopup();
+  markUnsaved();
+  const fallback=schedule[colorTargetDay]?.[colorTargetHour]?.text?TYPE_COL[schedule[colorTargetDay][colorTargetHour].type||'cur']:TYPE_COL.empty;
+  document.querySelectorAll('#legendList [data-hour="'+colorTargetHour+'"]').forEach(el=>el.style.background=fallback);
+  if(currentView==='radial') drawClock();
+  else buildWeeklyTable();
+}
+
+function hexToRgb(hex){
+  if(!hex)return'';
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return`rgb(${r}, ${g}, ${b})`;
+}
+
+// ══════════════════════════════════════════════
+// VIEW TOGGLE
+// ══════════════════════════════════════════════
+function setView(v){
+  currentView=v;
+  document.getElementById('viewRadial').classList.toggle('active',v==='radial');
+  document.getElementById('viewWeekly').classList.toggle('active',v==='weekly');
+  document.getElementById('radialView').style.display=v==='radial'?'':'none';
+  document.getElementById('weeklyView').style.display=v==='weekly'?'':'none';
+  if(v==='radial'){drawClock();buildDayAnswers();}else buildWeeklyTable();
+}
+
+// ══════════════════════════════════════════════
+// RADIAL CLOCK DRAW
+// ══════════════════════════════════════════════
+function drawClock(){
+  const canvas=document.getElementById('clockCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=580,H=580; canvas.width=W;canvas.height=H;
+  const cx=W/2,cy=H/2;
+  const R=W/2-12;       // 세그먼트 외곽
+  const Ri=W/2*0.32;    // 내부 원 반경
+
+  ctx.clearRect(0,0,W,H);
+
+  // background
+  ctx.beginPath();ctx.arc(cx,cy,R+12,0,Math.PI*2);ctx.fillStyle='#eeece8';ctx.fill();
+
+  // 24 segments
+  for(let i=0;i<24;i++){
+    const sa=(i/24)*Math.PI*2-Math.PI/2;
+    const ea=((i+1)/24)*Math.PI*2-Math.PI/2;
+    const mid=sa+(ea-sa)/2;
+    const h=HOURS[i];
+    const entry=schedule[curDay]?.[h];
+    const hasText=entry&&entry.text.trim();
+
+    // fill color: custom > type > empty
+    let col;
+    if(entry&&entry.color) col=entry.color;
+    else if(hasText) col=TYPE_COL[entry.type];
+    else col=TYPE_COL.empty;
+
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,sa,ea);ctx.closePath();
+    ctx.fillStyle=col;ctx.fill();
+    ctx.strokeStyle='#f4f3ef';ctx.lineWidth=2;ctx.stroke();
+
+    if(!hasText) continue;
+
+    // ── 텍스트 렌더링 ──
+    // B/D: 가로 한줄, measureText로 링너비 맞춤
+    // A/C: 세로 글자 배열, 글자수에 맞게 step 동적 계산 (링너비 기준)
+    const ringW=R-Ri;
+    const USABLE=ringW-8;  // 실제 사용 가능한 폭 (패딩 제외)
+    let FSIZE=13;
+    let txt=entry.text.trim();
+    if(txt.length>10)txt=txt.slice(0,10);
+
+    // 텍스트 색상
+    let textCol;
+    if(entry.color){
+      const r2=parseInt(entry.color.slice(1,3),16);
+      const g2=parseInt(entry.color.slice(3,5),16);
+      const b2=parseInt(entry.color.slice(5,7),16);
+      textCol=(r2*0.299+g2*0.587+b2*0.114)>140?'#111':'#fff';
+    } else {
+      textCol=hasText?TYPE_TEXT[entry.type]:'#bbb';
+    }
+    ctx.fillStyle=textCol;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+
+    const segMidR=Ri+ringW/2;
+
+    // ── A: 21~03시 — 세로, 바깥→안 (mid+90°) ──
+    if((i>=21&&i<=23)||(i>=0&&i<=3)){
+      const chars=txt.split('');
+      // step: 링너비를 글자수로 균등 분할 (B의 measureText와 동일 원리)
+      const step=Math.min(FSIZE*1.05, USABLE/Math.max(chars.length,1));
+      const total=(chars.length-1)*step;
+      ctx.font=FSIZE+'px "Noto Sans KR",sans-serif';
+      ctx.save();
+      ctx.translate(cx+segMidR*Math.cos(mid),cy+segMidR*Math.sin(mid));
+      ctx.rotate(mid+Math.PI/2);
+      chars.forEach((ch,ci)=>ctx.fillText(ch,0,-total/2+ci*step));
+      ctx.restore();
+
+    // ── B: 03~09시 — 가로 한줄, 안→바깥 (mid) ──
+    } else if(i>=3&&i<=9){
+      let fs=FSIZE;
+      ctx.font=fs+'px "Noto Sans KR",sans-serif';
+      while(ctx.measureText(txt).width>USABLE&&fs>7){fs-=0.5;ctx.font=fs+'px "Noto Sans KR",sans-serif';}
+      ctx.save();
+      ctx.translate(cx+segMidR*Math.cos(mid),cy+segMidR*Math.sin(mid));
+      ctx.rotate(mid);
+      ctx.fillText(txt,0,0);
+      ctx.restore();
+
+    // ── C: 09~14시 — 세로, 안→바깥 (mid-90°) ──
+    // A와 동일 로직, 방향만 반대
+    } else if(i>=9&&i<=13){
+      const chars=txt.split('');
+      const step=Math.min(FSIZE*1.05, USABLE/Math.max(chars.length,1));
+      const total=(chars.length-1)*step;
+      ctx.font=FSIZE+'px "Noto Sans KR",sans-serif';
+      ctx.save();
+      ctx.translate(cx+segMidR*Math.cos(mid),cy+segMidR*Math.sin(mid));
+      ctx.rotate(mid-Math.PI/2);
+      chars.forEach((ch,ci)=>ctx.fillText(ch,0,-total/2+ci*step));
+      ctx.restore();
+
+    // ── D: 14~21시 — 가로 한줄, 바깥→안 (mid+PI) ──
+    } else {
+      let fs=FSIZE;
+      ctx.font=fs+'px "Noto Sans KR",sans-serif';
+      while(ctx.measureText(txt).width>USABLE&&fs>7){fs-=0.5;ctx.font=fs+'px "Noto Sans KR",sans-serif';}
+      ctx.save();
+      ctx.translate(cx+segMidR*Math.cos(mid),cy+segMidR*Math.sin(mid));
+      ctx.rotate(mid+Math.PI);
+      ctx.fillText(txt,0,0);
+      ctx.restore();
+    }
+  }
+
+  // inner circle mask
+  ctx.beginPath();ctx.arc(cx,cy,Ri,0,Math.PI*2);
+  ctx.fillStyle='#f4f3ef';ctx.fill();
+  ctx.strokeStyle='#ddd';ctx.lineWidth=1;ctx.stroke();
+
+  // tick marks
+  for(let i=0;i<24;i++){
+    const angle=(i/24)*Math.PI*2-Math.PI/2;
+    const major=i%6===0,minor=i%3===0;
+    ctx.beginPath();
+    ctx.moveTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));
+    ctx.lineTo(cx+(R-(major?20:minor?12:7))*Math.cos(angle),cy+(R-(major?20:minor?12:7))*Math.sin(angle));
+    ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=major?2.5:1.5;ctx.stroke();
+  }
+
+  // hour labels (inside Ri)
+  for(let i=0;i<24;i+=3){
+    const angle=(i/24)*Math.PI*2-Math.PI/2;
+    const lr=Ri*0.70;
+    ctx.fillStyle='#777';ctx.font='12px "Noto Sans KR"';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(i===0?'0':String(i),cx+lr*Math.cos(angle),cy+lr*Math.sin(angle));
+  }
+
+  // center label
+  ctx.fillStyle='#555';ctx.font='500 13px "Noto Serif KR",serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(curDay.replace('요일',''),cx,cy-9);
+  ctx.fillStyle='#aaa';ctx.font='10px "Noto Sans KR"';
+  ctx.fillText('하루 시계',cx,cy+9);
+
+  buildGoalsMini();
+}
+
+function buildLegend(){
+  const list=document.getElementById('legendList');list.innerHTML='';
+  HOURS.forEach(h=>{
+    const e=schedule[curDay]?.[h];
+    const hasText=e&&e.text.trim();
+    const col=e&&e.color?e.color:(hasText?TYPE_COL[e.type]:TYPE_COL.empty);
+    const row=document.createElement('div');
+    row.style.cssText='display:grid;grid-template-columns:12px 44px 1fr;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f0f0f0;';
+    // color dot (클릭으로 색상 변경)
+    const dot=document.createElement('div');
+    dot.style.cssText=`width:11px;height:11px;border-radius:50%;background:${col};cursor:pointer;flex-shrink:0;border:1px solid #bbb;`;
+    dot.dataset.hour=h;
+    dot.title='색상 변경';
+    dot.onclick=(ev)=>{ev.stopPropagation();openColorPopup(curDay,h,dot);};
+    // time label
+    const timeSpan=document.createElement('span');
+    timeSpan.style.cssText='font-size:11px;color:#777;';
+    timeSpan.textContent=h;
+    // editable input
+    const inp=document.createElement('input');
+    inp.type='text';
+    inp.value=e?e.text:'';
+    inp.placeholder='활동 입력...';
+    inp.style.cssText='border:none;background:transparent;font-size:13px;color:#111;width:100%;outline:none;padding:0;font-family:"Noto Sans KR",sans-serif;';
+    const _h=h, _dot=dot;
+    inp.oninput=function(){
+      // DOM 재생성 없이 data만 업데이트 → 포커스 유지
+      ensureEntry(curDay,_h);
+      schedule[curDay][_h].text=this.value;
+      _dot.style.background=schedule[curDay][_h].color||TYPE_COL[schedule[curDay][_h].type];
+      markUnsaved();
+      drawClockDebounced(); // 캔버스만 다시 그림
+    };
+    row.append(dot,timeSpan,inp);
+    list.appendChild(row);
+  });
+}
+
+function openColorPopupById(h,anchor){openColorPopup(curDay,h,anchor);}
+
+function buildGoalsMini(){
+  const wrap=document.getElementById('goalsMini');
+  if(!goals.length){wrap.innerHTML='';return;}
+  const done=goals.filter(g=>g.done).length,pct=Math.round(done/goals.length*100);
+  const c=2*Math.PI*16,off=c*(1-pct/100);
+  wrap.innerHTML=`<div class="panel-title" style="margin:0 0 12px">올해 목표</div>
+  <div class="p-ring"><svg class="ring-svg" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="16" fill="none" stroke="#eee" stroke-width="3"/>
+    <circle cx="20" cy="20" r="16" fill="none" stroke="#2d2d2d" stroke-width="3"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"
+      transform="rotate(-90 20 20)" style="transition:stroke-dashoffset .4s"/>
+  </svg><div class="ring-info"><div class="ring-num">${pct}%</div>${done}/${goals.length}</div></div>
+  ${goals.map(g=>`<div class="leg-row" style="opacity:${g.done?.9:.55}"><div class="leg-dot" style="background:${g.done?'#2d2d2d':'#ccc'}"></div><span class="leg-time"></span><span class="leg-text" style="${g.done?'text-decoration:line-through;color:#aaa':''}">${g.text}</span><span></span></div>`).join('')}`;
+}
+
+// ══════════════════════════════════════════════
+// WEEKLY TABLE
+// ══════════════════════════════════════════════
+function buildWeeklyTable(){
+  const tbl=document.getElementById('weeklyTable');tbl.innerHTML='';
+  const thead=tbl.createTHead(),hrow=thead.insertRow();
+  const th0=document.createElement('th');th0.textContent='시간';th0.style.width='52px';hrow.appendChild(th0);
+  DAYS.forEach(d=>{const th=document.createElement('th');th.textContent=d.replace('요일','요');hrow.appendChild(th);});
+  const tbody=tbl.createTBody();
+  HOURS.forEach(h=>{
+    const tr=tbody.insertRow();
+    const tc=tr.insertCell();tc.className='time-col-td';tc.textContent=h;
+    DAYS.forEach(d=>{
+      const td=tr.insertCell();
+      const entry=schedule[d]?.[h];
+      const col=entry&&entry.color?entry.color:(entry&&entry.text?TYPE_COL[entry.type]:'transparent');
+      const wrap=document.createElement('div');wrap.className='wk-cell-wrap';
+      const bar=document.createElement('div');bar.className='wk-color-bar';bar.style.background=col;
+      bar.style.cursor='pointer'; bar.title='색상 변경';
+      bar.onclick=(ev)=>{ev.stopPropagation();openColorPopup(d,h,bar);};
+      const ta=document.createElement('textarea');ta.className='wk-inp';ta.rows=1;
+      ta.value=entry?entry.text:'';
+      ta.oninput=function(){ensureEntry(d,h);schedule[d][h].text=this.value;markUnsaved();};
+      wrap.append(bar,ta);td.appendChild(wrap);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════
+function renderCalendar(){
+  const dim=new Date(currentYear,currentMonth+1,0).getDate();
+  const fdow=new Date(currentYear,currentMonth,1).getDay();
+  const today=new Date();
+  const mn=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('monthTitle').textContent=`${currentYear}년 ${mn[currentMonth]}`;
+  const grid=document.getElementById('calGrid');grid.innerHTML='';
+  ['일','월','화','수','목','금','토'].forEach(d=>{const c=document.createElement('div');c.className='cal-dow';c.textContent=d;grid.appendChild(c);});
+  for(let i=0;i<fdow;i++){const e=document.createElement('div');e.className='cal-cell empty';grid.appendChild(e);}
+  for(let day=1;day<=dim;day++){
+    const dk=`${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isToday=today.getFullYear()===currentYear&&today.getMonth()===currentMonth&&today.getDate()===day;
+    const cell=document.createElement('div');cell.className='cal-cell'+(isToday?' today':'');
+    const dd=document.createElement('div');dd.className='cal-date';dd.textContent=day;cell.appendChild(dd);
+    (calEvents[dk]||[]).forEach((ev,idx)=>{
+      const dot=document.createElement('span');dot.className='ev t-'+ev.type;dot.textContent=ev.text;
+      dot.onclick=e=>{e.stopPropagation();openModal(dk,idx);};cell.appendChild(dot);
+    });
+    cell.onclick=()=>openModal(dk,null);grid.appendChild(cell);
+  }
+}
+function changeMonth(d){currentMonth+=d;if(currentMonth<0){currentMonth=11;currentYear--;}if(currentMonth>11){currentMonth=0;currentYear++;}renderCalendar();}
+
+// ══════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════
+function openModal(dk,idx){
+  modalDate=dk;modalEvIdx=idx;
+  document.getElementById('modalDel').style.display=idx!==null?'block':'none';
+  if(idx!==null){const ev=calEvents[dk][idx];document.getElementById('modalTitle').textContent=dk+' 수정';document.getElementById('modalText').value=ev.text;document.getElementById('modalType').value=ev.type;}
+  else{document.getElementById('modalTitle').textContent=dk+' 일정 추가';document.getElementById('modalText').value='';document.getElementById('modalType').value='cur';}
+  document.getElementById('modalOv').classList.add('open');
+  setTimeout(()=>document.getElementById('modalText').focus(),50);
+}
+function closeModal(){document.getElementById('modalOv').classList.remove('open');}
+function saveEvent(){
+  const text=document.getElementById('modalText').value.trim();if(!text){closeModal();return;}
+  const type=document.getElementById('modalType').value;
+  if(!calEvents[modalDate])calEvents[modalDate]=[];
+  if(modalEvIdx!==null)calEvents[modalDate][modalEvIdx]={text,type};else calEvents[modalDate].push({text,type});
+  closeModal();renderCalendar();markUnsaved();
+}
+function deleteEvent(){if(!confirm('삭제할까요?'))return;calEvents[modalDate].splice(modalEvIdx,1);closeModal();renderCalendar();markUnsaved();}
+document.getElementById('modalOv').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ══════════════════════════════════════════════
+// GOALS
+// ══════════════════════════════════════════════
+function renderGoals(){
+  const list=document.getElementById('goalsList');if(!list)return;list.innerHTML='';
+  if(!goals.length){list.innerHTML='<p style="font-size:13px;color:#aaa;padding:8px 0">목표를 추가하거나 질문지 Q17에 입력하세요</p>';return;}
+  goals.forEach((g,i)=>{
+    const item=document.createElement('div');item.className='goal-item';
+    item.innerHTML=`<input type="checkbox" class="goal-chk" ${g.done?'checked':''} onchange="toggleGoal(${i})"><span class="goal-txt" style="${g.done?'text-decoration:line-through;color:#aaa':''}">${g.text}</span><button class="goal-del" onclick="removeGoal(${i})">×</button>`;
+    list.appendChild(item);
+  });
+}
+function addGoal(){const inp=document.getElementById('newGoalInp'),t=inp.value.trim();if(!t)return;goals.push({text:t,done:false});inp.value='';renderGoals();markUnsaved();}
+function toggleGoal(i){goals[i].done=!goals[i].done;renderGoals();markUnsaved();}
+function removeGoal(i){goals.splice(i,1);renderGoals();markUnsaved();}
+
+// ══════════════════════════════════════════════
+// RATINGS
+// ══════════════════════════════════════════════
+function buildRatings(){
+  [['ratingQ9','q9r'],['ratingQ13','q13r']].forEach(([id,key])=>{
+    const wrap=document.getElementById(id);if(!wrap)return;
+    for(let v=1;v<=10;v++){
+      const btn=document.createElement('button');btn.className='rating-btn'+(ratingAnswers[key]===v?' sel':'');
+      btn.textContent=v;
+      btn.onclick=()=>{ratingAnswers[key]=v;wrap.querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');markUnsaved();};
+      wrap.appendChild(btn);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// SAVE / LOAD
+// ══════════════════════════════════════════════
+let unsaved=false;
+function markUnsaved(){unsaved=true;updateSaveNote(false);}
+function updateSaveNote(clean){
+  const n=document.getElementById('saveNote');
+  if(clean||!unsaved){n.textContent='✓ 저장 완료';n.style.color='#888';unsaved=false;}
+  else{n.textContent='● 저장하지 않은 변경사항';n.style.color='#555';}
+}
+
+function saveData(){
+  const data={schedule,calEvents,goals,qaireAnswers,dayAnswers,ratingAnswers,savedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  const now=new Date(),stamp=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  a.href=URL.createObjectURL(blob);a.download=`나의시간_${stamp}.json`;a.click();URL.revokeObjectURL(a.href);
+  updateSaveNote(true);
+}
+
+function loadData(){document.getElementById('fileInput').click();}
+function handleLoad(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      schedule=d.schedule||{};DAYS.forEach(day=>{if(!schedule[day])schedule[day]={};});
+      calEvents=d.calEvents||{};goals=d.goals||[];
+      qaireAnswers=d.qaireAnswers||{};
+      dayAnswers=d.dayAnswers||{};DAYS.forEach(day=>{if(!dayAnswers[day])dayAnswers[day]={};});
+      ratingAnswers=d.ratingAnswers||{};
+      document.querySelectorAll('.qaire-ans').forEach(ta=>{
+        const key=ta.dataset.key;
+        ta.value=ta.dataset.dayKey?(dayAnswers[curDay][key]||''):(qaireAnswers[key]||'');
+      });
+      document.querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('sel'));
+      buildRatings();buildQaireTimeGrid();renderCalendar();renderGoals();updateSaveNote(true);
+      alert('✓ 불러오기 완료\n저장 일시: '+(d.savedAt?new Date(d.savedAt).toLocaleString('ko-KR'):'알 수 없음'));
+    }catch{alert('파일을 읽을 수 없습니다.');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+function doPrint(){
+  // 타임테이블 페이지로 이동 후 모든 요일 캔버스를 순서대로 인쇄
+  showPage('clock');
+  setView('radial');
+
+  // 인쇄용 캔버스 이미지를 요일별로 생성
+  const printWin = window.open('','_blank','width=900,height=700');
+  printWin.document.write(`<!DOCTYPE html><html><head>
+  <meta charset="UTF-8">
+  <title>타임테이블</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;background:#fff}
+    body{font-family:'Noto Sans KR',sans-serif;}
+    .day-sheet{
+      width:100vw;height:100vh;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      page-break-after:always;
+    }
+    .day-sheet:last-child{page-break-after:auto}
+    .day-title{font-family:'Noto Serif KR',serif;font-size:22px;letter-spacing:4px;color:#111;margin-bottom:20px;font-weight:300}
+    .day-canvas{width:520px;height:520px;border-radius:50%}
+    @media print{
+      html,body{width:210mm;height:297mm}
+      .day-sheet{width:210mm;height:297mm;page-break-after:always;}
+      .day-sheet:last-child{page-break-after:auto}
+    }
+  </style></head><body>`);
+
+  const savedDay = curDay;
+  let rendered = 0;
+
+  function renderDayToPrint(dayIdx){
+    if(dayIdx >= DAYS.length){
+      printWin.document.write('</body></html>');
+      printWin.document.close();
+      curDay = savedDay;
+      buildClockDayBar();
+      setTimeout(()=>{printWin.focus();printWin.print();},800);
+      return;
+    }
+    const d = DAYS[dayIdx];
+    curDay = d;
+    drawClock(); // canvas에 그리기
+
+    setTimeout(()=>{
+      const canvas = document.getElementById('clockCanvas');
+      const dataUrl = canvas.toDataURL('image/png');
+      const entries = HOURS.filter(h=>schedule[d]?.[h]?.text?.trim());
+
+      printWin.document.write(`<div class="day-sheet">`);
+      printWin.document.write(`<div class="day-title">${d}</div>`);
+      printWin.document.write(`<img class="day-canvas" src="${dataUrl}">`);
+
+
+      printWin.document.write('</div>');
+      renderDayToPrint(dayIdx+1);
+    }, 120);
+  }
+
+  renderDayToPrint(0);
+}
+
+// START
+init();
+</script>
+</body>
+</html>
